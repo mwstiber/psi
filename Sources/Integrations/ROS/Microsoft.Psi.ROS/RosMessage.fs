@@ -144,13 +144,13 @@ module RosMessage =
     let toDateTime (sec: uint32) (nsec: uint32) = (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).AddSeconds(float sec).AddMilliseconds(float nsec / 1000000.0)
     let fromDateTime (dt: DateTime) =
         let sec = dt.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds
-        let nsec = (sec - Math.Truncate(sec)) * 1000000.0
+        let nsec = (sec - Math.Truncate(sec)) * 1000000000.0
         uint32 sec, uint32 nsec
 
     let toTimeSpan sec nsec = (new TimeSpan(0, 0, 0, sec, nsec / 1000000))
     let fromTimeSpan (ts: TimeSpan) =
         let sec = ts.TotalSeconds
-        let nsec = (sec - Math.Truncate(sec)) * 1000000.0
+        let nsec = (sec - Math.Truncate(sec)) * 1000000000.0
         int sec, int nsec
         
     type MessageDef = { Type:   string
@@ -170,5 +170,13 @@ module RosMessage =
                                                              MD5          = md5
                                                              CallFields   = List.ofSeq callFields
                                                              ReturnFields = List.ofSeq returnFields }
+                                                             
+    let CreateStructDef def = StructDef (def.Fields)
+    
+    let CreateStructVal fields = StructVal (List.ofSeq fields)
+
+    let CreateVariableArrayVal vals = VariableArrayVal (List.ofSeq vals)
+
+    let CreatFixedArrayVal vals = FixedArrayVal (List.ofSeq vals)
 
     let malformed () = failwith "Malformed message structure"
